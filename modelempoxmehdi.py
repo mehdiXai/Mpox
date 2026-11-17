@@ -17,12 +17,12 @@ import sys
 sys.stdout.reconfigure(encoding='utf-8')
 
 # ========================
-# 1️⃣ Loading the Dataset with Data Augmentation
+# 1️⃣ Loading the Dataset
 # ========================
-data_dir = "C:/Users/HP pro/OneDrive/Desktop/memoir/teste_belhia/Augimg (2)/Augimg"  # Path containing both class folders
-num_images = 204  # Number of images to use
+data_dir = "C:/Users/HP pro/OneDrive/Desktop/memoir/teste_belhia/Augimg (2)/Augimg"  
+num_images = 204  
 
-# 📌 Transformations with Data Augmentation
+# Transformations
 train_transform = transforms.Compose([
     transforms.RandomResizedCrop(224, scale=(0.8, 1.0)),
     transforms.RandomHorizontalFlip(),
@@ -39,7 +39,7 @@ eval_transform = transforms.Compose([
     transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])
 ])
 
-# 📌 Load dataset
+# Load dataset
 train_full_dataset = torchvision.datasets.ImageFolder(root=data_dir, transform=train_transform)
 eval_full_dataset = torchvision.datasets.ImageFolder(root=data_dir, transform=eval_transform)
 if len(train_full_dataset.classes) != 2:
@@ -54,7 +54,7 @@ subset_dataset, _ = random_split(
     generator=generator
 )
 
-# 📌 Split into training and test sets
+# Split into training and test sets
 train_size = int(0.83 * num_images)
 test_size = num_images - train_size
 train_dataset, test_dataset = random_split(
@@ -67,7 +67,7 @@ train_indices = [subset_dataset.indices[i] for i in train_dataset.indices]
 train_dataset = torch.utils.data.Subset(train_full_dataset, train_indices)
 test_dataset = torch.utils.data.Subset(eval_full_dataset, test_indices)
 
-# 📌 DataLoaders
+# DataLoaders
 train_loader = DataLoader(train_dataset, batch_size=128, shuffle=True)
 test_loader = DataLoader(test_dataset, batch_size=128, shuffle=False)
 
@@ -88,8 +88,8 @@ early_stopping_patience = 10
 best_loss = float("inf")
 epochs_no_improve = 0
 
-criterion = nn.CrossEntropyLoss(label_smoothing=0.1)  # 📌 Label Smoothing
-optimizer = optim.Adam(model.parameters(), lr=0.0001)  # 📌 Reduced initial LR
+criterion = nn.CrossEntropyLoss(label_smoothing=0.1)  # Label Smoothing
+optimizer = optim.Adam(model.parameters(), lr=0.0001)  # Reduced initial LR
 scheduler = optim.lr_scheduler.ReduceLROnPlateau(optimizer, mode='min', factor=0.5, patience=5)
 
 train_losses, test_losses = [], []
@@ -99,7 +99,7 @@ for epoch in range(num_epochs):
     model.train()
     running_loss, correct, total = 0.0, 0, 0
 
-    with tqdm(train_loader, desc=f"📌 Epoch {epoch+1}/{num_epochs}") as pbar:
+    with tqdm(train_loader, desc=f"Epoch {epoch+1}/{num_epochs}") as pbar:
         for images, labels in pbar:
             images, labels = images.to(device), labels.to(device)
 
@@ -119,7 +119,7 @@ for epoch in range(num_epochs):
     train_losses.append(train_loss)
     train_accs.append(train_acc)
 
-    # 📌 Evaluate on the test set
+    # Evaluate on the test set
     model.eval()
     test_loss, correct, total = 0.0, 0, 0
 
@@ -139,11 +139,11 @@ for epoch in range(num_epochs):
     test_losses.append(test_loss)
     test_accs.append(test_acc)
 
-    print(f"📌 Epoch [{epoch+1}/{num_epochs}] - Loss (Train/Test): {train_loss:.4f}/{test_loss:.4f}, Accuracy (Train/Test): {train_acc:.2f}%/{test_acc:.2f}%")
+    print(f"Epoch [{epoch+1}/{num_epochs}] - Loss (Train/Test): {train_loss:.4f}/{test_loss:.4f}, Accuracy (Train/Test): {train_acc:.2f}%/{test_acc:.2f}%")
 
     scheduler.step(test_loss)
 
-    # 📌 Early Stopping
+    # Early Stopping
     if test_loss < best_loss:
         best_loss = test_loss
         epochs_no_improve = 0
@@ -155,10 +155,10 @@ for epoch in range(num_epochs):
         epochs_no_improve += 1
 
     if epochs_no_improve >= early_stopping_patience:
-        print(f"📌 Early stopping triggered after {epoch+1} epochs without improvement.")
+        print(f"Early stopping triggered after {epoch+1} epochs without improvement.")
         break
 
-# 📌 Load the best model
+# Load the best model
 model.load_state_dict(best_model)
 
 # ==============================
@@ -176,12 +176,12 @@ with torch.no_grad():
         y_true.extend(labels.cpu().numpy())
         y_scores.extend(probs.cpu().numpy())
 
-# 📌 Find the best threshold
+# Find the best threshold
 precision, recall, thresholds = precision_recall_curve(y_true, y_scores)
 valid_precision_recall = precision[:-1] * recall[:-1]
 optimal_idx = np.argmax(valid_precision_recall)
 optimal_threshold = thresholds[optimal_idx]
-print(f"📌 Best classification threshold: {optimal_threshold:.2f}")
+print(f"Best classification threshold: {optimal_threshold:.2f}")
 
 y_pred = [1 if score >= optimal_threshold else 0 for score in y_scores]
 
@@ -189,11 +189,11 @@ y_pred = [1 if score >= optimal_threshold else 0 for score in y_scores]
 # 5️⃣ Plot Confusion Matrix & ROC Curve
 # ==============================
 conf_matrix = confusion_matrix(y_true, y_pred)
-class_names = ["Monkey pox", "Others"]  # Replace with actual class names
+class_names = ["Monkey pox", "Others"] 
 
 print("\nClassification Report:\n", classification_report(y_true, y_pred, target_names=class_names))
 
-# 📌 Confusion Matrix Plot
+# Confusion Matrix Plot
 plt.figure(figsize=(6, 5))
 sns.heatmap(conf_matrix, annot=True, fmt="d", cmap="magma", xticklabels=class_names, yticklabels=class_names)
 plt.xlabel("Predicted Labels")
@@ -201,7 +201,7 @@ plt.ylabel("True Labels")
 plt.title("Confusion Matrix")
 plt.show()
 
-# 📌 ROC Curve Plot
+# ROC Curve Plot
 fpr, tpr, _ = roc_curve(y_true, y_scores)
 roc_auc = auc(fpr, tpr)
 
@@ -215,18 +215,18 @@ plt.legend(loc="lower right")
 plt.show()
 
 # ==============================
-# 📌 6️⃣ Loss & Accuracy Evaluation with Recognition Rate
+# 6️⃣ Loss & Accuracy Evaluation with Recognition Rate
 # ==============================
 
 epochs = range(1, len(train_losses) + 1)
 
-# 📌 Display the final recognition rate
+# Display the final recognition rate
 final_test_acc = test_accs[-1]
-print(f"📌 Final Recognition Rate: {final_test_acc:.2f}%")
+print(f"Final Recognition Rate: {final_test_acc:.2f}%")
 
 plt.figure(figsize=(12, 5))
 
-# 📌 Loss Curve (Train vs. Test)
+# Loss Curve (Train vs. Test)
 plt.subplot(1, 2, 1)
 plt.plot(epochs, train_losses, label="Training Loss", marker='o', color='blue')
 plt.plot(epochs, test_losses, label="Test Loss", marker='o', color='red')
@@ -235,7 +235,7 @@ plt.ylabel("Loss")
 plt.title("Loss Evaluation")
 plt.legend()
 
-# 📌 Accuracy Curve (Train vs. Test) + Recognition Rate
+# Accuracy Curve (Train vs. Test) + Recognition Rate
 plt.subplot(1, 2, 2)
 plt.plot(epochs, train_accs, label="Training Accuracy", marker='o', color='blue')
 plt.plot(epochs, test_accs, label="Test Accuracy", marker='o', color='red')
