@@ -19,7 +19,7 @@ sys.stdout.reconfigure(encoding='utf-8')
 # ========================
 # 1️⃣ Loading the Dataset
 # ========================
-data_dir = "C:/Users/HP pro/OneDrive/Desktop/memoir/teste_belhia/Augimg (2)/Augimg"  
+data_dir = "Augimg"  
 num_images = 204  
 
 # Transformations
