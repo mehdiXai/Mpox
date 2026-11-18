@@ -79,15 +79,13 @@ Le script affiche la progression par époque, le seuil de classification optimal
 
 ## Résultats
 
-Classification Report:
-| |precision|recall|f1-score|support|
-|---|---|---|---|---|
-|Monkey pox|0.87 |0.81 | 0.84 | 16|
-|Others|0.85|0.89 | 0.87 | 19|
-|
-|accuracy | 0.86 | 35|
-|macro avg | 0.86 | 0.85 | 0.86 | 35|
-|weighted avg | 0.86 | 0.86 | 0.86 | 35|
+| Class            | Precision | Recall | F1-score | Support |
+| ---------------- | --------- | ------ | -------- | ------- |
+| Monkey pox       | 0.87      | 0.81   | 0.84     | 16      |
+| Others           | 0.85      | 0.89   | 0.87     | 19      |
+| **Accuracy**     |           |        | **0.86** | **35**  |
+| **Macro Avg**    | 0.86      | 0.85   | 0.86     | 35      |
+| **Weighted Avg** | 0.86      | 0.86   | 0.86     | 35      |
 
 Final Recognition Rate: 71.43%
 
